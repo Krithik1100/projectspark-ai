@@ -21,9 +21,18 @@ serve(async (req) => {
       "User-Agent": "Project-Recommender-App",
     };
 
-    // Use provided token or make unauthenticated request (60 req/hour limit)
-    if (githubToken) {
+    // Validate and use provided token (must be ASCII only for HTTP headers)
+    // GitHub tokens are alphanumeric with underscores, typically starting with 'ghp_' or 'github_pat_'
+    const isValidToken = githubToken && 
+      typeof githubToken === 'string' && 
+      /^[a-zA-Z0-9_]+$/.test(githubToken) &&
+      githubToken.length > 10;
+
+    if (isValidToken) {
       headers["Authorization"] = `token ${githubToken}`;
+      console.log("Using provided GitHub token for authentication");
+    } else if (githubToken) {
+      console.log("Invalid GitHub token format, proceeding without authentication");
     }
 
     const response = await fetch(
