@@ -1,0 +1,13 @@
+project_id = "hqyqcepifptdkhtxemkx"
+
+[functions.generate-titles]
+verify_jwt = false
+
+[functions.fetch-github-repos]
+verify_jwt = false
+
+[functions.calculate-risk]
+verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
