@@ -40,13 +40,12 @@ export function useProjectRecommender() {
         return;
       }
 
-      // Step 2: Fetch GitHub repos and calculate uniqueness
+      // Step 2: Fetch GitHub repos and calculate uniqueness (uses server-side token)
       const titles = generatedProjects.map((p: any) => p.title);
       const { data: githubData, error: githubError } = await supabase.functions.invoke('fetch-github-repos', {
         body: {
           domain: preferences.domain,
           titles,
-          githubToken: tokens.githubToken,
         },
       });
 

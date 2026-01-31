@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { domain, titles, githubToken } = await req.json();
+    const { domain, titles } = await req.json();
 
     // Build search query
     const searchQuery = encodeURIComponent(`${domain} in:name,description,readme`);
@@ -21,18 +21,14 @@ serve(async (req) => {
       "User-Agent": "Project-Recommender-App",
     };
 
-    // Validate and use provided token (must be ASCII only for HTTP headers)
-    // GitHub tokens are alphanumeric with underscores, typically starting with 'ghp_' or 'github_pat_'
-    const isValidToken = githubToken && 
-      typeof githubToken === 'string' && 
-      /^[a-zA-Z0-9_]+$/.test(githubToken) &&
-      githubToken.length > 10;
-
-    if (isValidToken) {
+    // Use GitHub token from environment secrets
+    const githubToken = Deno.env.get("GitHub_API_PAT_KEY");
+    
+    if (githubToken) {
       headers["Authorization"] = `token ${githubToken}`;
-      console.log("Using provided GitHub token for authentication");
-    } else if (githubToken) {
-      console.log("Invalid GitHub token format, proceeding without authentication");
+      console.log("Using GitHub token from secrets for authenticated requests");
+    } else {
+      console.log("No GitHub token configured, using unauthenticated requests (60 req/hour limit)");
     }
 
     const response = await fetch(
