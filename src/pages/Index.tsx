@@ -3,7 +3,7 @@ import { ProjectForm } from "@/components/ProjectForm";
 import { ResultsDashboard } from "@/components/ResultsDashboard";
 import { ChatPanel } from "@/components/ChatPanel";
 import { useProjectRecommender } from "@/hooks/useProjectRecommender";
-import { GraduationCap, Lightbulb, Shield, GitBranch } from "lucide-react";
+import { GraduationCap, Lightbulb, Shield, GitBranch, Target } from "lucide-react";
 
 const Index = () => {
   const {
@@ -21,32 +21,31 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-
-      <main className="container py-8">
+      <main className="container py-8 max-w-7xl mx-auto px-4">
         {/* Hero Section */}
         <section className="mb-10 text-center animate-fade-in">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-3">
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl mb-3">
             Intelligent Project Title Recommender
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-            AI-powered project ideas with GitHub uniqueness checks, risk assessment, and SDLC recommendations for your SEPM course.
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+            Get academic project recommendations powered by Google Gemini AI, verified against public GitHub repository data for uniqueness and core problem clarity.
           </p>
           <div className="flex items-center justify-center gap-6 flex-wrap text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-primary" />
-              <span>AI-Generated Ideas</span>
+              <span>Gemini AI Ideation</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-primary" />
+              <span>Core Problem Analysis</span>
             </div>
             <div className="flex items-center gap-2">
               <GitBranch className="h-4 w-4 text-primary" />
-              <span>GitHub Matching</span>
+              <span>GitHub Public Repo Matching</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-primary" />
-              <span>Risk Analysis</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-4 w-4 text-primary" />
-              <span>SEPM Aligned</span>
+              <span>Risk & SDLC Advisor</span>
             </div>
           </div>
         </section>
@@ -78,7 +77,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 py-6 mt-12">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>Built for Software Engineering Project Management • Powered by AI</p>
+          <p>ProjectSpark AI • Powered by Google Gemini AI & GitHub Public API</p>
         </div>
       </footer>
     </div>

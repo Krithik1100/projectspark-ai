@@ -1,4 +1,4 @@
-import { Lightbulb, GraduationCap } from "lucide-react";
+import { Lightbulb, Sparkles } from "lucide-react";
 
 export function Header() {
   return (
@@ -9,12 +9,17 @@ export function Header() {
             <Lightbulb className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-foreground">
-              Project Recommender
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold tracking-tight text-foreground">
+                ProjectSpark AI
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary border border-primary/20">
+                <Sparkles className="h-2.5 w-2.5" />
+                Gemini Powered
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <GraduationCap className="h-3 w-3" />
-              SEPM Risk Advisor
+              Project Title Recommender & GitHub Uniqueness Analyzer
             </p>
           </div>
         </div>

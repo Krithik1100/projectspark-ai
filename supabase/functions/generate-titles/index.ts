@@ -13,84 +13,86 @@ serve(async (req) => {
   try {
     const { domain, teamSize, duration, technology } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured in Supabase Secrets");
     }
 
-    const systemPrompt = `You are an expert software engineering project advisor specializing in academic software projects. Generate unique, feasible project ideas for students.
+    const systemInstruction = `You are a premier Software Engineering and Project Management (SEPM) academic advisor.
+Your mission is to generate innovative, academic-grade capstone/course project ideas for engineering students.
+Every project MUST explicitly solve a clear real-world problem and possess a distinct uniqueness factor compared to standard generic GitHub repositories.`;
 
-When generating project ideas, consider:
-- Academic setting and learning objectives
-- Team collaboration requirements
-- Real-world applicability
-- Technology stack compatibility
-- Time constraints and complexity balance
-
-Always provide practical, implementable projects with clear scope.`;
-
-    const userPrompt = `Generate 5 unique software project title ideas for a team with these specifications:
-- Domain: ${domain}
-- Team Size: ${teamSize} members
-- Duration: ${duration} weeks
+    const userPrompt = `Generate 5 innovative, realistic software engineering project title recommendations with these criteria:
+- Target Domain: ${domain}
+- Team Size: ${teamSize} students
+- Project Timeline: ${duration} weeks
 - Technology Stack: ${technology}
 
-For each project, provide:
-1. A creative, descriptive title
-2. A 2-3 sentence description of what the project does and its key features
-3. Estimate implementation complexity (Low/Medium/High)
+For each of the 5 projects, return a JSON object with:
+1. "title": A professional, concise, academic-grade project title.
+2. "description": 2-3 sentences explaining what the system does and its key functional modules.
+3. "problemSolved": Exactly what specific real-world gap, user pain point, or operational inefficiency this project solves.
+4. "uniquenessFactor": What makes this project distinct, novel, or superior compared to existing standard open-source boilerplate projects.
+5. "complexity": "Low", "Medium", or "High".
 
-Format your response as a JSON array with objects containing: title, description, complexity.
-Only return the JSON array, no other text.`;
+Return ONLY a valid JSON array of objects with keys: ["title", "description", "problemSolved", "uniquenessFactor", "complexity"].
+Do not wrap in markdown quotes if possible, or return strictly valid JSON.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(geminiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: `${systemInstruction}\n\n${userPrompt}` }],
+          },
         ],
-        temperature: 0.8,
+        generationConfig: {
+          temperature: 0.7,
+          topP: 0.95,
+          responseMimeType: "application/json",
+        },
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API error:", response.status, errorText);
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "Gemini API rate limit reached. Please retry in a few moments." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "API credits exhausted. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ error: `Gemini API error: ${response.status}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    const geminiData = await response.json();
+    const candidateText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // Parse the JSON from the response
+    if (!candidateText) {
+      throw new Error("No response generated by Gemini AI");
+    }
+
     let projects = [];
     try {
-      // Extract JSON array from the response
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        projects = JSON.parse(jsonMatch[0]);
-      }
+      // Parse JSON directly
+      projects = JSON.parse(candidateText.trim());
     } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
-      // Return empty array on parse failure
+      console.warn("Direct JSON parse failed, cleaning text:", parseError);
+      const cleanJson = candidateText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+      projects = JSON.parse(cleanJson);
     }
 
     return new Response(
@@ -100,7 +102,7 @@ Only return the JSON array, no other text.`;
   } catch (error) {
     console.error("generate-titles error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Internal error generating titles" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
