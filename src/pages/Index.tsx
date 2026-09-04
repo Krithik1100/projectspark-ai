@@ -12,8 +12,6 @@ const Index = () => {
     isDemo,
     chatMessages,
     isChatLoading,
-    tokens,
-    setTokens,
     generateProjects,
     sendChatMessage,
     askAboutProject,
@@ -21,7 +19,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header tokens={tokens} onTokensChange={setTokens} />
+      <Header />
+
 
       <main className="container py-8">
         {/* Hero Section */}
