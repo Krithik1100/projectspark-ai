@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+  </defs>
+  <!-- Background rounded box -->
+  <rect width="32" height="32" rx="8" fill="url(#sparkGrad)" />
+  <!-- Sparkle / Lightning shape -->
+  <path d="M16 4 L18.5 12.5 L27 15 L18.5 17.5 L16 26 L13.5 17.5 L5 15 L13.5 12.5 Z" fill="#ffffff" />
+  <circle cx="23" cy="9" r="1.5" fill="#ffffff" opacity="0.8" />
+  <circle cx="9" cy="23" r="1.5" fill="#ffffff" opacity="0.8" />
+</svg>

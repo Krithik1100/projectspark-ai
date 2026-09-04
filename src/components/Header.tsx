@@ -15,7 +15,7 @@ export function Header() {
               </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary border border-primary/20">
                 <Sparkles className="h-2.5 w-2.5" />
-                Gemini Powered
+                AI Powered
               </span>
             </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">

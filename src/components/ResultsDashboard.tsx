@@ -143,7 +143,7 @@ export function ResultsDashboard({ projects, onAskAbout, isDemo }: ResultsDashbo
                           className="hover:bg-primary hover:text-primary-foreground text-xs"
                           onClick={() => onAskAbout(project)}
                         >
-                          Ask Gemini
+                          Ask AI
                         </Button>
                       </TableCell>
                     </TableRow>

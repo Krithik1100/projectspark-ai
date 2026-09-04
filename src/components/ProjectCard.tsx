@@ -132,7 +132,7 @@ export function ProjectCard({ project, onAskAbout, index }: ProjectCardProps) {
           onClick={() => onAskAbout(project)}
         >
           <MessageCircle className="mr-2 h-4 w-4" />
-          Explain in Chat (Gemini AI)
+          Explain in Chat (AI)
         </Button>
       </div>
     </Card>

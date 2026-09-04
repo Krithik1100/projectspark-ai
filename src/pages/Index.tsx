@@ -28,12 +28,12 @@ const Index = () => {
             Intelligent Project Title Recommender
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-            Get academic project recommendations powered by Google Gemini AI, verified against public GitHub repository data for uniqueness and core problem clarity.
+            Get academic project recommendations powered by AI, verified against public GitHub repository data for uniqueness and core problem clarity.
           </p>
           <div className="flex items-center justify-center gap-6 flex-wrap text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-primary" />
-              <span>Gemini AI Ideation</span>
+              <span>AI Ideation</span>
             </div>
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" />
@@ -77,7 +77,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 py-6 mt-12">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>ProjectSpark AI • Powered by Google Gemini AI & GitHub Public API</p>
+          <p>ProjectSpark AI • AI-Powered Project Recommender & GitHub Public API</p>
         </div>
       </footer>
     </div>
