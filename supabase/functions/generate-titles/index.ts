@@ -38,12 +38,12 @@ For each of the 5 projects, return a JSON object with:
 
 Return ONLY a valid JSON array of objects with keys: ["title", "description", "problemSolved", "uniquenessFactor", "complexity"].`;
 
-    // Try primary model, with fallback models if 404
+    // Models available for your key (gemini-2.5-flash confirmed working)
     const modelsToTry = [
-      "gemini-1.5-flash",
-      "gemini-1.5-flash-latest",
-      "gemini-2.0-flash",
-      "gemini-1.5-pro"
+      "gemini-2.5-flash",
+      "gemini-flash-latest",
+      "gemini-2.5-pro",
+      "gemini-1.5-flash"
     ];
 
     let lastError = "";
