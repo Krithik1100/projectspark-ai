@@ -42,25 +42,58 @@ const TECHNOLOGIES = [
   "Next.js + PostgreSQL",
 ];
 
+const CUSTOM_VALUE = "__custom__";
+
 export function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
   const [domain, setDomain] = useState<string>("");
+  const [customDomain, setCustomDomain] = useState<string>("");
+  const [isCustomDomain, setIsCustomDomain] = useState(false);
+
+  const [technology, setTechnology] = useState<string>("");
+  const [customTechnology, setCustomTechnology] = useState<string>("");
+  const [isCustomTechnology, setIsCustomTechnology] = useState(false);
+
   const [teamSize, setTeamSize] = useState<string>("3");
   const [duration, setDuration] = useState<string>("8");
-  const [technology, setTechnology] = useState<string>("");
+
+  const handleDomainChange = (value: string) => {
+    if (value === CUSTOM_VALUE) {
+      setIsCustomDomain(true);
+      setDomain("");
+    } else {
+      setIsCustomDomain(false);
+      setCustomDomain("");
+      setDomain(value);
+    }
+  };
+
+  const handleTechnologyChange = (value: string) => {
+    if (value === CUSTOM_VALUE) {
+      setIsCustomTechnology(true);
+      setTechnology("");
+    } else {
+      setIsCustomTechnology(false);
+      setCustomTechnology("");
+      setTechnology(value);
+    }
+  };
+
+  const effectiveDomain = isCustomDomain ? customDomain.trim() : domain;
+  const effectiveTechnology = isCustomTechnology ? customTechnology.trim() : technology;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!domain || !technology) return;
+    if (!effectiveDomain || !effectiveTechnology) return;
 
     onSubmit({
-      domain,
+      domain: effectiveDomain,
       teamSize: parseInt(teamSize),
       duration: parseInt(duration),
-      technology,
+      technology: effectiveTechnology,
     });
   };
 
-  const isValid = domain && technology && teamSize && duration;
+  const isValid = effectiveDomain && effectiveTechnology && teamSize && duration;
 
   return (
     <Card className="shadow-lg border-border/50 bg-card">
@@ -76,42 +109,102 @@ export function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-5 md:grid-cols-2">
+            {/* Domain / Industry */}
             <div className="space-y-2">
               <Label htmlFor="domain" className="flex items-center gap-2">
                 <FolderSearch className="h-4 w-4 text-muted-foreground" />
                 Domain / Industry
               </Label>
-              <Select value={domain} onValueChange={setDomain}>
-                <SelectTrigger id="domain">
-                  <SelectValue placeholder="Select a domain" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DOMAINS.map((d) => (
-                    <SelectItem key={d} value={d}>
-                      {d}
+              {isCustomDomain ? (
+                <div className="flex gap-2">
+                  <Input
+                    id="domain"
+                    value={customDomain}
+                    onChange={(e) => setCustomDomain(e.target.value)}
+                    placeholder="e.g. Agriculture, Legal Tech, Logistics..."
+                    autoFocus
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 text-xs h-10"
+                    onClick={() => {
+                      setIsCustomDomain(false);
+                      setCustomDomain("");
+                      setDomain("");
+                    }}
+                  >
+                    Presets
+                  </Button>
+                </div>
+              ) : (
+                <Select value={domain} onValueChange={handleDomainChange}>
+                  <SelectTrigger id="domain">
+                    <SelectValue placeholder="Select a domain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DOMAINS.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={CUSTOM_VALUE} className="text-primary font-medium border-t border-border/50 mt-1">
+                      ✏️ Enter custom domain...
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
+            {/* Preferred Technology */}
             <div className="space-y-2">
               <Label htmlFor="technology" className="flex items-center gap-2">
                 <Code className="h-4 w-4 text-muted-foreground" />
                 Preferred Technology
               </Label>
-              <Select value={technology} onValueChange={setTechnology}>
-                <SelectTrigger id="technology">
-                  <SelectValue placeholder="Select technology stack" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TECHNOLOGIES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
+              {isCustomTechnology ? (
+                <div className="flex gap-2">
+                  <Input
+                    id="technology"
+                    value={customTechnology}
+                    onChange={(e) => setCustomTechnology(e.target.value)}
+                    placeholder="e.g. Rust + Actix, Go + gRPC, MERN..."
+                    autoFocus
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 text-xs h-10"
+                    onClick={() => {
+                      setIsCustomTechnology(false);
+                      setCustomTechnology("");
+                      setTechnology("");
+                    }}
+                  >
+                    Presets
+                  </Button>
+                </div>
+              ) : (
+                <Select value={technology} onValueChange={handleTechnologyChange}>
+                  <SelectTrigger id="technology">
+                    <SelectValue placeholder="Select technology stack" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TECHNOLOGIES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={CUSTOM_VALUE} className="text-primary font-medium border-t border-border/50 mt-1">
+                      ✏️ Enter custom technology...
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="space-y-2">
