@@ -13,10 +13,11 @@ serve(async (req) => {
   try {
     const { messages, projectContext } = await req.json();
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
+    const rawKey = Deno.env.get("GEMINI_API_KEY");
+    if (!rawKey) {
       throw new Error("GEMINI_API_KEY is not configured in Supabase Secrets");
     }
+    const GEMINI_API_KEY = rawKey.trim();
 
     const systemPrompt = `You are ProjectSpark AI, an elite Software Engineering & Project Management (SEPM) advisor.
 Your primary role is to guide students and developers through:
@@ -30,48 +31,58 @@ ${projectContext ? `Current User Context: ${projectContext}` : ""}
 Keep explanations clear, technically rigorous, inspiring, and actionable. Use markdown headings, bullet points, and code snippets where helpful.`;
 
     // Map messages into Gemini's contents format
-    // Gemini roles: "user" | "model"
     const contents = (messages || []).map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
     }));
 
-    // Prepend system prompt to the first user message or as system_instruction
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`;
+    const modelsToTry = [
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-latest",
+      "gemini-2.0-flash",
+      "gemini-1.5-pro"
+    ];
 
-    const response = await fetch(geminiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: systemPrompt }],
-        },
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-        },
-      }),
-    });
+    let responseStream: Response | null = null;
+    let lastError = "";
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Gemini stream error:", response.status, errText);
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded on Gemini API. Please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    for (const model of modelsToTry) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`;
+
+      const res = await fetch(geminiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        responseStream = res;
+        break;
+      } else {
+        const errText = await res.text();
+        lastError = `Model ${model} returned ${res.status}: ${errText}`;
+        console.warn(lastError);
       }
+    }
+
+    if (!responseStream || !responseStream.body) {
       return new Response(
-        JSON.stringify({ error: `Gemini API error: ${response.status}` }),
+        JSON.stringify({ error: `Gemini streaming failed. ${lastError}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Stream the Gemini response directly to client using SSE
-    return new Response(response.body, {
+    return new Response(responseStream.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
