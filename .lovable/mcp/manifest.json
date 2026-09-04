@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "sdk_version": "1.0.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://hqyqcepifptdkhtxemkx.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "projectspark-ai",
+      "version": "0.1.0",
+      "title": "ProjectSpark AI"
+    },
+    "tools": [
+      {
+        "name": "recommend_project_titles",
+        "title": "Recommend project titles",
+        "description": "Generate candidate student software project titles with short implementation notes for a domain, team size, duration and preferred technology.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "string",
+              "description": "Application domain, e.g. Healthcare, Education, E-Commerce."
+            },
+            "teamSize": {
+              "type": "number",
+              "description": "Number of students on the team."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Available project duration in weeks."
+            },
+            "technology": {
+              "type": "string",
+              "description": "Preferred technology stack."
+            },
+            "count": {
+              "type": "number",
+              "description": "How many ideas to return (5 by default, 10 maximum)."
+            }
+          },
+          "required": [
+            "domain",
+            "teamSize",
+            "duration",
+            "technology"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "check_title_uniqueness",
+        "title": "Check title uniqueness",
+        "description": "Compare a project title against public GitHub repositories and return a uniqueness percentage plus the closest matching repositories.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Project title to check."
+            },
+            "domain": {
+              "type": "string",
+              "description": "Optional domain keyword to focus the GitHub search."
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "assess_project_risk",
+        "title": "Assess project risk",
+        "description": "Rule-based SEPM assessment of a project idea: risk level (Low/Medium/High), estimated effort in weeks and a suggested SDLC model.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Project title being assessed."
+            },
+            "domain": {
+              "type": "string",
+              "description": "Application domain, e.g. Healthcare, E-Commerce."
+            },
+            "complexity": {
+              "type": "string",
+              "description": "Perceived complexity: Low, Medium or High."
+            },
+            "teamSize": {
+              "type": "number",
+              "description": "Number of students on the team."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Available project duration in weeks."
+            },
+            "technology": {
+              "type": "string",
+              "description": "Preferred technology stack."
+            }
+          },
+          "required": [
+            "title",
+            "domain",
+            "complexity",
+            "teamSize",
+            "duration",
+            "technology"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
